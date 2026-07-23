@@ -1,0 +1,117 @@
+[
+  {
+    "id": 1784394146895,
+    "name": "ewrw",
+    "price": 22222,
+    "category": "bag",
+    "image": "uploads/1784394146894-215745311.jpg",
+    "description": "wedw"
+  },
+  {
+    "id": 1784398578583,
+    "name": "yutly",
+    "price": 4454,
+    "category": "bag",
+    "image": "uploads/1784398578581-666196557.jpg",
+    "description": "ui"
+  },
+  {
+    "id": 1784400544419,
+    "name": "jk;we",
+    "price": 21,
+    "category": "bag",
+    "image": "uploads/1784400544417-638756304.jpg",
+    "description": "12"
+  },
+  {
+    "id": 1784403562833,
+    "name": "hvgo",
+    "price": 77787,
+    "category": "bag",
+    "image": "uploads/1784403562831-44904114.jpg",
+    "description": "juiio"
+  },
+  {
+    "id": 1784404954647,
+    "name": "wd",
+    "price": 333,
+    "category": "bag",
+    "image": "uploads/1784404954644-772779039.jpg",
+    "description": "dcscs"
+  },
+  {
+    "id": 1784405466447,
+    "name": "dvd",
+    "price": 22,
+    "category": "backpack",
+    "image": "uploads/1784405466442-6379105.jpg",
+    "description": "3232"
+  },
+  {
+    "id": 1,
+    "name": "Розовое кольцо",
+    "price": 93,
+    "category": "accessory",
+    "images": [
+      "uploads/photo1.jpg",
+      "uploads/photo2.jpg",
+      "uploads/photo3.jpg",
+      "uploads/photo4.jpg"
+    ],
+    "description": "..."
+  },
+  {
+    "id": 1784494491080,
+    "name": "dvd",
+    "price": 89,
+    "category": "bag",
+    "image": "uploads/1784494491077-197307993.jpg",
+    "images": [
+      "uploads/1784494491077-197307993.jpg",
+      "uploads/1784494491077-224155094.jpg",
+      "uploads/1784494491078-237966205.jpg"
+    ],
+    "description": "Стильный и качественный товар."
+  },
+  {
+    "id": 1784539797371,
+    "name": "wd",
+    "price": 78,
+    "category": "bag",
+    "images": [
+      "uploads/1784539797361-520110411.jpg",
+      "uploads/1784539797364-637619537.jpg",
+      "uploads/1784539797365-832459921.jpg"
+    ],
+    "image": "uploads/1784539797361-520110411.jpg",
+    "description": "Стильный и качественный товар."
+  },
+  {
+    "id": 1784636570666,
+    "name": "Сумка Dior",
+    "price": 200,
+    "category": "accessory",
+    "images": [
+      "uploads/1784636570559-471907181.jpg",
+      "uploads/1784636570619-205351159.jpg",
+      "uploads/1784636570650-877754173.jpg",
+      "uploads/1784636570658-967408435.jpg"
+    ],
+    "image": "uploads/1784636570559-471907181.jpg",
+    "description": "Dior твой стиль"
+  },
+  {
+    "id": 1784744188868,
+    "name": "333",
+    "price": 1222,
+    "category": "bag",
+    "images": [
+      "uploads/1784744188862-310311918.webp",
+      "uploads/1784744188862-715590796.jpg",
+      "uploads/1784744188865-467641182.jpg",
+      "uploads/1784744188866-92669826.jpg"
+    ],
+    "image": "uploads/1784744188862-310311918.webp",
+    "description": "ggg"
+  }
+]

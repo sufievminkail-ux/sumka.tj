@@ -1,0 +1,2880 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Админ-панель | sumka.tj</title>
+<link rel="stylesheet" href="/admin.css">
+
+<style>
+body.admin-locked .admin-layout { display: none !important; }
+.admin-login-screen { min-height: 100vh; display: grid; place-items: center; padding: 24px; background: radial-gradient(circle at top, #252525, #090909 65%); }
+.admin-login-card { width: min(420px, 100%); padding: 34px; border: 1px solid rgba(255,255,255,.12); border-radius: 24px; background: rgba(22,22,22,.94); box-shadow: 0 25px 80px rgba(0,0,0,.45); color: #fff; }
+.admin-login-card h1 { margin: 0 0 8px; }
+.admin-login-card p { color: #aaa; margin: 0 0 24px; }
+.admin-login-card input { width: 100%; box-sizing: border-box; margin: 8px 0; padding: 14px 16px; border-radius: 12px; border: 1px solid #333; background: #101010; color: #fff; }
+.admin-login-card button { width: 100%; margin-top: 12px; padding: 14px; border: 0; border-radius: 12px; background: #fff; color: #111; font-weight: 700; cursor: pointer; }
+.admin-login-error { min-height: 20px; color: #ff6b6b; margin-top: 12px; font-size: 14px; }
+
+.image-preview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 12px;
+}
+.image-preview-item {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    border-radius: 14px;
+    overflow: hidden;
+    background: #f1f1f1;
+    border: 1px solid rgba(0,0,0,.08);
+}
+.image-preview-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.image-preview-item span {
+    position: absolute;
+    left: 6px;
+    bottom: 6px;
+    padding: 3px 7px;
+    border-radius: 999px;
+    background: rgba(0,0,0,.65);
+    color: #fff;
+    font-size: 11px;
+}
+@media (max-width: 600px) {
+    .image-preview-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+</style>
+</head>
+
+<body class="admin-locked">
+
+<div class="admin-login-screen" id="admin-login-screen">
+  <form class="admin-login-card" id="admin-login-form">
+    <h1>👜 Sumka.tj</h1>
+    <p>Закрытая панель администратора</p>
+    <input id="admin-username" autocomplete="username" placeholder="Логин" required>
+    <input id="admin-password" type="password" autocomplete="current-password" placeholder="Пароль" required>
+    <button type="submit">Войти в админку</button>
+    <div class="admin-login-error" id="admin-login-error"></div>
+  </form>
+</div>
+
+<div id="admin-app">
+<div class="admin-layout">
+
+<aside class="sidebar" id="sidebar">
+
+    <div class="sidebar-logo">
+        <div class="logo-icon">👜</div>
+
+        <div class="logo-text">
+            <strong>sumka.tj</strong>
+            <span>Admin Panel</span>
+        </div>
+
+        <button
+            class="sidebar-close"
+            id="sidebarClose"
+            type="button"
+        >×</button>
+    </div>
+
+    <nav class="sidebar-nav">
+
+        <p class="nav-title">ОСНОВНОЕ</p>
+
+        <button
+            class="nav-link active"
+            data-section="dashboard"
+        >
+            <span class="nav-icon">📊</span>
+            <span>Обзор</span>
+        </button>
+
+        <button
+            class="nav-link"
+            data-section="products-section"
+        >
+            <span class="nav-icon">👜</span>
+            <span>Товары</span>
+            <b id="sidebar-products-count" class="nav-count">0</b>
+        </button>
+
+        <button
+            class="nav-link"
+            data-section="orders-section"
+        >
+            <span class="nav-icon">📦</span>
+            <span>Заказы</span>
+            <b id="sidebar-orders-count" class="nav-count">0</b>
+        </button>
+
+        <p class="nav-title nav-title-bottom">СИСТЕМА</p>
+
+        <a href="/" class="nav-link">
+            <span class="nav-icon">🌐</span>
+            <span>Открыть магазин</span>
+        </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+
+        <div class="admin-profile">
+            <div class="profile-avatar">A</div>
+
+            <div>
+                <strong>Администратор</strong>
+                <span>sumka.tj</span>
+            </div>
+        </div>
+
+    </div>
+
+</aside>
+
+
+<main class="main-content">
+
+<header class="topbar">
+
+    <button
+        class="mobile-menu"
+        id="mobile-menu"
+        type="button"
+    >
+        ☰
+    </button>
+
+    <div class="topbar-title">
+        <span>Панель управления</span>
+        <small>Управление магазином</small>
+    </div>
+
+    <div class="topbar-actions">
+
+        <div class="store-status">
+            <span class="status-dot"></span>
+            Магазин работает
+        </div>
+
+        <div class="topbar-avatar">A</div>
+
+    </div>
+
+</header>
+
+
+<div class="page-content">
+
+
+<!-- DASHBOARD -->
+
+<section
+    id="dashboard"
+    class="page-section active-section"
+>
+
+    <div class="welcome-header">
+
+        <div>
+            <p class="eyebrow">ДОБРО ПОЖАЛОВАТЬ 👋</p>
+
+            <h1>Обзор магазина</h1>
+
+            <p class="page-description">
+                Следите за товарами и заказами вашего магазина.
+            </p>
+        </div>
+
+        <button
+            class="primary-button"
+            onclick="openAddProduct()"
+        >
+            <span>+</span>
+            Добавить товар
+        </button>
+
+    </div>
+
+
+    <div class="stats-grid">
+
+        <div class="stat-card">
+            <div class="stat-card-top">
+                <div class="stat-icon purple">👜</div>
+                <span class="stat-label">ТОВАРЫ</span>
+            </div>
+
+            <strong
+                id="products-count"
+                class="stat-number"
+            >
+                0
+            </strong>
+
+            <span class="stat-bottom">
+                Всего товаров
+            </span>
+        </div>
+
+
+        <div class="stat-card">
+            <div class="stat-card-top">
+                <div class="stat-icon orange">📦</div>
+                <span class="stat-label">ЗАКАЗЫ</span>
+            </div>
+
+            <strong
+                id="orders-count"
+                class="stat-number"
+            >
+                0
+            </strong>
+
+            <span class="stat-bottom">
+                Всего заказов
+            </span>
+        </div>
+
+
+        <div class="stat-card">
+            <div class="stat-card-top">
+                <div class="stat-icon green">🟢</div>
+                <span class="stat-label">СТАТУС</span>
+            </div>
+
+            <strong class="stat-number status-text">
+                Online
+            </strong>
+
+            <span class="stat-bottom">
+                Магазин активен
+            </span>
+        </div>
+
+
+        <div class="stat-card">
+            <div class="stat-card-top">
+                <div class="stat-icon blue">✨</div>
+                <span class="stat-label">SUMKA.TJ</span>
+            </div>
+
+            <strong class="stat-number">
+                24/7
+            </strong>
+
+            <span class="stat-bottom">
+                Работа магазина
+            </span>
+        </div>
+
+    </div>
+
+
+    <div class="dashboard-grid">
+
+        <div class="dashboard-card">
+
+            <div class="card-heading">
+
+                <div>
+                    <h2>Быстрые действия</h2>
+                    <p>Управляйте магазином быстрее</p>
+                </div>
+
+                <span class="heading-icon">⚡</span>
+
+            </div>
+
+
+            <div class="quick-actions">
+
+                <button
+                    class="quick-action"
+                    onclick="openAddProduct()"
+                >
+                    <span class="quick-icon purple">+</span>
+
+                    <span>
+                        <strong>Добавить товар</strong>
+                        <small>Создать новый товар</small>
+                    </span>
+
+                    <b>→</b>
+                </button>
+
+
+                <button
+                    class="quick-action"
+                    onclick="showSection('products-section')"
+                >
+                    <span class="quick-icon orange">👜</span>
+
+                    <span>
+                        <strong>Управление товарами</strong>
+                        <small>Просмотр каталога</small>
+                    </span>
+
+                    <b>→</b>
+                </button>
+
+
+                <button
+                    class="quick-action"
+                    onclick="showSection('orders-section')"
+                >
+                    <span class="quick-icon green">📦</span>
+
+                    <span>
+                        <strong>Просмотр заказов</strong>
+                        <small>Управление заказами</small>
+                    </span>
+
+                    <b>→</b>
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="dashboard-card tips-card">
+
+            <div class="card-heading">
+
+                <div>
+                    <h2>Подсказка</h2>
+                    <p>Для эффективной работы</p>
+                </div>
+
+                <span class="heading-icon">💡</span>
+
+            </div>
+
+
+            <div class="tip-content">
+
+                <div class="tip-emoji">🚀</div>
+
+                <div>
+                    <h3>Развивайте свой магазин</h3>
+
+                    <p>
+                        Добавляйте новые товары,
+                        следите за заказами и поддерживайте
+                        актуальный каталог.
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="dashboard-card recent-card">
+
+        <div class="card-heading">
+
+            <div>
+                <h2>Последние заказы</h2>
+                <p>Недавняя активность магазина</p>
+            </div>
+
+            <button
+                class="text-button"
+                onclick="showSection('orders-section')"
+            >
+                Все заказы →
+            </button>
+
+        </div>
+
+        <div
+            id="recent-orders"
+            class="recent-orders"
+        >
+            <div class="loading">
+                Загрузка заказов...
+            </div>
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- PRODUCTS -->
+
+<section
+    id="products-section"
+    class="page-section"
+>
+
+    <div class="section-header">
+
+        <div>
+
+            <p class="eyebrow">КАТАЛОГ</p>
+
+            <h1>Товары</h1>
+
+            <p class="page-description">
+                Управляйте товарами вашего магазина.
+            </p>
+
+        </div>
+
+
+        <button
+            class="primary-button"
+            onclick="openAddProduct()"
+        >
+            <span>+</span>
+            Новый товар
+        </button>
+
+    </div>
+
+
+    <div class="toolbar">
+
+        <div class="search-box">
+            <span>🔍</span>
+
+            <input
+                id="product-search"
+                type="text"
+                placeholder="Поиск товара..."
+            >
+        </div>
+
+
+        <select
+            id="category-filter"
+            class="filter-select"
+        >
+
+            <option value="all">
+                Все категории
+            </option>
+
+            <option value="bag">
+                👜 Сумки
+            </option>
+
+            <option value="backpack">
+                🎒 Рюкзаки
+            </option>
+
+            <option value="accessory">
+                👛 Аксессуары
+            </option>
+
+        </select>
+
+    </div>
+
+
+    <div
+        id="products"
+        class="products-grid"
+    >
+        <div class="loading">
+            Загрузка товаров...
+        </div>
+    </div>
+
+</section>
+
+
+<!-- ORDERS -->
+
+<section
+    id="orders-section"
+    class="page-section"
+>
+
+    <div class="section-header">
+
+        <div>
+
+            <p class="eyebrow">ПРОДАЖИ</p>
+
+            <h1>Заказы</h1>
+
+            <p class="page-description">
+                Управляйте заказами клиентов.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="orders-filter">
+
+        <button
+            class="order-filter active"
+            data-filter="all"
+        >
+            Все
+        </button>
+
+        <button
+            class="order-filter"
+            data-filter="Новый"
+        >
+            Новые
+        </button>
+
+        <button
+            class="order-filter"
+            data-filter="Принят"
+        >
+            Принятые
+        </button>
+
+        <button
+            class="order-filter"
+            data-filter="Готовится"
+        >
+            Готовятся
+        </button>
+
+        <button
+            class="order-filter"
+            data-filter="Отправлен"
+        >
+            Отправленные
+        </button>
+
+        <button
+            class="order-filter"
+            data-filter="Доставлен"
+        >
+            Доставленные
+        </button>
+
+    </div>
+
+
+    <div
+        id="orders"
+        class="orders-grid"
+    >
+        <div class="loading">
+            Загрузка заказов...
+        </div>
+    </div>
+
+</section>
+
+</div>
+
+</main>
+
+</div>
+
+
+<!-- PRODUCT MODAL -->
+
+<div
+    id="product-modal"
+    class="modal-overlay"
+    aria-hidden="true"
+>
+
+    <div
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+    >
+
+        <div class="modal-header">
+
+            <div>
+
+                <p class="eyebrow">КАТАЛОГ</p>
+
+                <h2 id="modal-title">
+                    Новый товар
+                </h2>
+
+            </div>
+
+
+            <button
+                class="modal-close"
+                type="button"
+                onclick="closeAddProduct()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form id="product-form">
+
+            <div class="form-group">
+
+                <label for="product-name">
+                    Название товара
+                </label>
+
+                <input
+                    id="product-name"
+                    type="text"
+                    placeholder="Например: Кожаная сумка"
+                    required
+                >
+
+            </div>
+
+
+            <div class="form-row">
+
+                <div class="form-group">
+
+                    <label for="product-price">
+                        Цена
+                    </label>
+
+                    <div class="input-with-suffix">
+
+                        <input
+                            id="product-price"
+                            type="number"
+                            min="1"
+                            placeholder="0"
+                            required
+                        >
+
+                        <span>сомони</span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="form-group">
+
+                    <label for="product-category">
+                        Категория
+                    </label>
+
+                    <select
+                        id="product-category"
+                        required
+                    >
+
+                        <option value="bag">
+                            👜 Сумка
+                        </option>
+
+                        <option value="backpack">
+                            🎒 Рюкзак
+                        </option>
+
+                        <option value="accessory">
+                            👛 Аксессуар
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label>
+                    Фотографии товара
+                </label>
+
+                <label class="file-upload">
+
+                    <input
+                        id="product-images"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                    >
+
+                    <span class="upload-icon">
+                        📸
+                    </span>
+
+                    <strong>
+                        Нажмите для загрузки
+                    </strong>
+
+                    <small>
+                        PNG, JPG или WEBP — максимум 4 фото
+                    </small>
+
+                </label>
+
+
+                <div
+                    id="file-names"
+                    class="file-name"
+                ></div>
+
+                <div id="image-preview" class="image-preview-grid" aria-live="polite"></div>
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="product-description">
+                    Описание
+                </label>
+
+                <textarea
+                    id="product-description"
+                    placeholder="Описание товара..."
+                ></textarea>
+
+            </div>
+
+
+            <div
+                id="product-message"
+                class="form-message"
+            ></div>
+
+
+            <div class="modal-actions">
+
+                <button
+                    type="button"
+                    class="secondary-button"
+                    onclick="closeAddProduct()"
+                >
+                    Отмена
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="primary-button"
+                    id="submit-product-button"
+                >
+                    Добавить товар
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<div
+    id="toast-container"
+    class="toast-container"
+></div>
+
+
+<script>
+
+"use strict";
+
+
+let allProducts = [];
+let allOrders = [];
+let currentOrderFilter = "all";
+
+const productModal =
+    document.getElementById("product-modal");
+
+const productForm =
+    document.getElementById("product-form");
+
+
+// ==============================
+// JSON
+// ==============================
+
+async function getJsonResponse(response) {
+
+    const text = await response.text();
+
+    if (!text.trim()) {
+        return {};
+    }
+
+    try {
+        return JSON.parse(text);
+    }
+
+    catch (error) {
+
+        throw new Error(
+            "Сервер вернул неправильный ответ"
+        );
+
+    }
+
+}
+
+
+// ==============================
+// NAVIGATION
+// ==============================
+
+function showSection(sectionId) {
+
+    document
+        .querySelectorAll(".page-section")
+        .forEach(section => {
+
+            section.classList.remove(
+                "active-section"
+            );
+
+        });
+
+
+    const section =
+        document.getElementById(sectionId);
+
+
+    if (section) {
+
+        section.classList.add(
+            "active-section"
+        );
+
+    }
+
+
+    document
+        .querySelectorAll(
+            ".nav-link[data-section]"
+        )
+        .forEach(link => {
+
+            link.classList.toggle(
+                "active",
+                link.dataset.section === sectionId
+            );
+
+        });
+
+
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+
+
+    document
+        .getElementById("sidebar")
+        .classList.remove(
+            "mobile-open"
+        );
+
+}
+
+
+document
+    .querySelectorAll(
+        ".nav-link[data-section]"
+    )
+    .forEach(link => {
+
+        link.addEventListener(
+            "click",
+            () => {
+
+                showSection(
+                    link.dataset.section
+                );
+
+            }
+        );
+
+    });
+
+
+// ==============================
+// PRODUCTS
+// ==============================
+
+async function loadProducts() {
+
+    const container =
+        document.getElementById("products");
+
+
+    try {
+
+        const response =
+            await fetch("/api/products");
+
+
+        const products =
+            await getJsonResponse(response);
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                products.message ||
+                "Ошибка загрузки товаров"
+            );
+
+        }
+
+
+        allProducts =
+            Array.isArray(products)
+                ? products
+                : [];
+
+
+        updateProductCounters();
+
+        renderProducts();
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+
+        container.innerHTML = `
+
+            <div class="empty-state">
+
+                <div>⚠️</div>
+
+                <h3>Ошибка загрузки</h3>
+
+                <p>
+                    ${escapeHtml(error.message)}
+                </p>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+function updateProductCounters() {
+
+    const count =
+        allProducts.length;
+
+
+    document
+        .getElementById("products-count")
+        .textContent = count;
+
+
+    document
+        .getElementById("sidebar-products-count")
+        .textContent = count;
+
+}
+
+
+function getCategoryName(category) {
+
+    const categories = {
+
+        bag: "Сумка",
+
+        backpack: "Рюкзак",
+
+        accessory: "Аксессуар"
+
+    };
+
+
+    return categories[category]
+        || category
+        || "Товар";
+
+}
+
+
+function getProductImages(product) {
+
+    if (
+
+        Array.isArray(product.images) &&
+
+        product.images.length
+
+    ) {
+
+        return product.images
+            .filter(Boolean)
+            .slice(0, 4);
+
+    }
+
+
+    if (product.image) {
+
+        return [product.image];
+
+    }
+
+
+    return [];
+
+}
+
+
+function renderProducts() {
+
+    const container =
+        document.getElementById("products");
+
+
+    const search =
+        document
+            .getElementById("product-search")
+            .value
+            .trim()
+            .toLowerCase();
+
+
+    const category =
+        document
+            .getElementById("category-filter")
+            .value;
+
+
+    const products =
+        allProducts.filter(product => {
+
+
+            const name =
+                String(
+                    product.name || ""
+                )
+                .toLowerCase();
+
+
+            const matchesSearch =
+                name.includes(search);
+
+
+            const matchesCategory =
+                category === "all"
+                ||
+                product.category === category;
+
+
+            return (
+                matchesSearch
+                &&
+                matchesCategory
+            );
+
+        });
+
+
+    if (!products.length) {
+
+        container.innerHTML = `
+
+            <div class="empty-state">
+
+                <div>👜</div>
+
+                <h3>Товары не найдены</h3>
+
+                <p>
+                    Попробуйте изменить поиск
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+
+        products
+            .map(product => {
+
+
+                const images =
+                    getProductImages(product);
+
+
+                const mainImage =
+                    images[0] || "";
+
+
+                const imageHtml =
+                    mainImage
+
+                    ? `
+
+                        <img
+                            src="/${mainImage}"
+                            alt="${escapeHtml(product.name)}"
+                            class="product-main-image"
+                            onerror="
+                                this.onerror=null;
+                                this.src='/bag1.jpg';
+                            "
+                        >
+
+                    `
+
+                    : `
+
+                        <div class="product-no-image">
+                            👜
+                        </div>
+
+                    `;
+
+
+                const thumbnailsHtml =
+
+                    images.length > 1
+
+                    ? `
+
+                        <div class="product-thumbnails">
+
+                            ${
+
+                                images
+                                    .map(
+                                        (image, index) => `
+
+                                            <button
+                                                type="button"
+                                                class="
+                                                    product-thumbnail
+                                                    ${
+                                                        index === 0
+                                                            ? "active"
+                                                            : ""
+                                                    }
+                                                "
+                                                onclick="
+                                                    changeProductImage(
+                                                        this,
+                                                        '${escapeHtml(image)}'
+                                                    )
+                                                "
+                                            >
+
+                                                <img
+                                                    src="/${image}"
+                                                    alt="Фото ${index + 1}"
+                                                >
+
+                                            </button>
+
+                                        `
+                                    )
+                                    .join("")
+
+                            }
+
+                        </div>
+
+                    `
+
+                    : "";
+
+
+                return `
+
+                    <article
+                        class="product-card"
+                        data-product-id="${product.id}"
+                    >
+
+                        <div class="product-card-image">
+
+                            ${imageHtml}
+
+
+                            <span class="product-category">
+
+                                ${escapeHtml(
+                                    getCategoryName(
+                                        product.category
+                                    )
+                                )}
+
+                            </span>
+
+
+                            <div
+                                class="product-card-actions"
+                            >
+
+                                <button
+                                    class="product-edit"
+                                    type="button"
+                                    title="Редактировать товар"
+                                    onclick="
+                                        editProduct(
+                                            '${product.id}'
+                                        )
+                                    "
+                                >
+                                    ✏️
+                                </button>
+
+
+                                <button
+                                    class="product-delete"
+                                    type="button"
+                                    title="Удалить товар"
+                                    onclick="
+                                        deleteProduct(
+                                            '${product.id}'
+                                        )
+                                    "
+                                >
+                                    🗑️
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        ${thumbnailsHtml}
+
+
+                        <div
+                            class="product-card-body"
+                        >
+
+                            <h3
+                                class="product-title"
+                            >
+                                ${escapeHtml(
+                                    product.name
+                                )}
+                            </h3>
+
+
+                            <p
+                                class="product-description"
+                            >
+                                ${escapeHtml(
+                                    product.description ||
+                                    "Описание отсутствует"
+                                )}
+                            </p>
+
+
+                            <div
+                                class="product-card-bottom"
+                            >
+
+                                <strong
+                                    class="product-price"
+                                >
+
+                                    ${Number(
+                                        product.price || 0
+                                    ).toLocaleString(
+                                        "ru-RU"
+                                    )}
+
+                                    <small>
+                                        сомони
+                                    </small>
+
+                                </strong>
+
+
+                                <span
+                                    class="product-photo-count"
+                                >
+                                    📷 ${images.length}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                    </article>
+
+                `;
+
+            })
+
+            .join("");
+
+}
+
+
+function changeProductImage(
+    button,
+    image
+) {
+
+    const card =
+        button.closest(
+            ".product-card"
+        );
+
+
+    if (!card) return;
+
+
+    const mainImage =
+        card.querySelector(
+            ".product-main-image"
+        );
+
+
+    if (!mainImage) return;
+
+
+    mainImage.src =
+        "/" + image;
+
+
+    card
+        .querySelectorAll(
+            ".product-thumbnail"
+        )
+        .forEach(item => {
+
+            item.classList.remove(
+                "active"
+            );
+
+        });
+
+
+    button.classList.add(
+        "active"
+    );
+
+}
+
+
+// ==============================
+// ADD / EDIT PRODUCT
+// ==============================
+
+function openAddProduct() {
+
+    productForm.reset();
+
+    delete productForm.dataset.editId;
+
+
+    document
+        .getElementById("modal-title")
+        .textContent =
+        "Новый товар";
+
+
+    document
+        .getElementById(
+            "submit-product-button"
+        )
+        .textContent =
+        "Добавить товар";
+
+
+    document
+        .getElementById("file-names")
+        .textContent = "";
+
+
+    document
+        .getElementById("product-message")
+        .textContent = "";
+
+
+    productModal.classList.add(
+        "active"
+    );
+
+
+    productModal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+
+    document.body.classList.add(
+        "modal-open"
+    );
+
+}
+
+
+function editProduct(id) {
+
+    const product =
+        allProducts.find(
+            item =>
+                String(item.id)
+                ===
+                String(id)
+        );
+
+
+    if (!product) {
+
+        showToast(
+            "Товар не найден",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    productForm.dataset.editId =
+        product.id;
+
+
+    document
+        .getElementById("modal-title")
+        .textContent =
+        "Редактировать товар";
+
+
+    document
+        .getElementById(
+            "submit-product-button"
+        )
+        .textContent =
+        "Сохранить изменения";
+
+
+    document
+        .getElementById("product-name")
+        .value =
+        product.name || "";
+
+
+    document
+        .getElementById("product-price")
+        .value =
+        product.price || "";
+
+
+    document
+        .getElementById("product-category")
+        .value =
+        product.category || "bag";
+
+
+    document
+        .getElementById("product-description")
+        .value =
+        product.description || "";
+
+
+    document
+        .getElementById("product-images")
+        .value = "";
+
+
+    document
+        .getElementById("file-names")
+        .textContent =
+        "Если выбрать новые фото, старые фотографии будут заменены";
+
+
+    document
+        .getElementById("product-message")
+        .textContent = "";
+
+
+    productModal.classList.add(
+        "active"
+    );
+
+
+    productModal.setAttribute(
+        "aria-hidden",
+        "false"
+    );
+
+
+    document.body.classList.add(
+        "modal-open"
+    );
+
+}
+
+
+function closeAddProduct() {
+
+    productModal.classList.remove(
+        "active"
+    );
+
+
+    productModal.setAttribute(
+        "aria-hidden",
+        "true"
+    );
+
+
+    document.body.classList.remove(
+        "modal-open"
+    );
+
+
+    productForm.reset();
+
+    delete productForm.dataset.editId;
+
+}
+
+
+productModal.addEventListener(
+    "click",
+    event => {
+
+        if (
+            event.target === productModal
+        ) {
+
+            closeAddProduct();
+
+        }
+
+    }
+);
+
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if (
+            event.key === "Escape"
+            &&
+            productModal.classList.contains(
+                "active"
+            )
+        ) {
+
+            closeAddProduct();
+
+        }
+
+    }
+);
+
+
+// ==============================
+// FILES
+// ==============================
+
+document
+    .getElementById("product-images")
+    .addEventListener(
+        "change",
+        event => {
+            const files = Array.from(event.target.files || []);
+            const fileNames = document.getElementById("file-names");
+            const preview = document.getElementById("image-preview");
+
+            console.log("Выбрано фотографий:", files.length);
+            preview.innerHTML = "";
+
+            if (files.length > 4) {
+                showToast("Можно добавить максимум 4 фотографии", "error");
+                event.target.value = "";
+                fileNames.textContent = "";
+                return;
+            }
+
+            fileNames.textContent = files.map(file => file.name).join(", ");
+
+            files.forEach((file, index) => {
+                const item = document.createElement("div");
+                item.className = "image-preview-item";
+                const img = document.createElement("img");
+                img.alt = file.name;
+                const label = document.createElement("span");
+                label.textContent = `Фото ${index + 1}`;
+                item.append(img, label);
+                preview.appendChild(item);
+
+                const reader = new FileReader();
+                reader.onload = e => { img.src = e.target.result; };
+                reader.readAsDataURL(file);
+            });
+        }
+    );
+
+
+// ==============================
+// SUBMIT PRODUCT
+// ==============================
+
+productForm.addEventListener(
+    "submit",
+    submitProduct
+);
+
+
+async function submitProduct(event) {
+
+    event.preventDefault();
+
+
+    const editId =
+        productForm.dataset.editId;
+
+
+    const name =
+        document
+            .getElementById(
+                "product-name"
+            )
+            .value
+            .trim();
+
+
+    const price =
+        document
+            .getElementById(
+                "product-price"
+            )
+            .value;
+
+
+    const category =
+        document
+            .getElementById(
+                "product-category"
+            )
+            .value;
+
+
+    const description =
+        document
+            .getElementById(
+                "product-description"
+            )
+            .value
+            .trim();
+
+
+    const imageInput =
+        document
+            .getElementById(
+                "product-images"
+            );
+
+
+    const message =
+        document
+            .getElementById(
+                "product-message"
+            );
+
+
+    try {
+
+
+        message.className =
+            "form-message loading-message";
+
+
+        message.textContent =
+            "⏳ Сохранение...";
+
+
+        const formData =
+            new FormData();
+
+
+        formData.append(
+            "name",
+            name
+        );
+
+
+        formData.append(
+            "price",
+            price
+        );
+
+
+        formData.append(
+            "category",
+            category
+        );
+
+
+        formData.append(
+            "description",
+            description
+        );
+
+
+        Array
+            .from(
+                imageInput.files
+            )
+            .forEach(file => {
+
+                formData.append(
+                    "images",
+                    file
+                );
+
+            });
+
+
+        const response =
+            await fetch(
+
+                editId
+
+                    ? "/api/products/" +
+                        editId
+
+                    : "/api/products",
+
+                {
+
+                    method:
+                        editId
+                            ? "PUT"
+                            : "POST",
+
+                    body:
+                        formData
+
+                }
+
+            );
+
+
+        const result =
+            await getJsonResponse(
+                response
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                result.message ||
+                "Ошибка сохранения товара"
+            );
+
+        }
+
+
+        closeAddProduct();
+
+
+        showToast(
+
+            editId
+
+                ? "Товар обновлён"
+
+                : "Товар добавлен",
+
+            "success"
+
+        );
+
+
+        await loadProducts();
+
+
+    }
+
+    catch (error) {
+
+
+        console.error(error);
+
+
+        message.className =
+            "form-message error-message";
+
+
+        message.textContent =
+            "❌ " +
+            error.message;
+
+    }
+
+}
+
+
+// ==============================
+// DELETE PRODUCT
+// ==============================
+
+async function deleteProduct(id) {
+
+
+    if (
+        !confirm(
+            "Удалить этот товар?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+
+        const response =
+            await fetch(
+
+                "/api/products/" +
+                id,
+
+                {
+
+                    method:
+                        "DELETE"
+
+                }
+
+            );
+
+
+        const result =
+            await getJsonResponse(
+                response
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                result.message ||
+                "Ошибка удаления товара"
+            );
+
+        }
+
+
+        showToast(
+            "Товар удалён",
+            "success"
+        );
+
+
+        await loadProducts();
+
+
+    }
+
+    catch (error) {
+
+
+        showToast(
+            error.message,
+            "error"
+        );
+
+    }
+
+}
+
+
+// ==============================
+// ORDERS
+// ==============================
+
+async function loadOrders() {
+
+    try {
+
+
+        const response =
+            await fetch(
+                "/api/orders"
+            );
+
+
+        const orders =
+            await getJsonResponse(
+                response
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                orders.message ||
+                "Ошибка загрузки заказов"
+            );
+
+        }
+
+
+        allOrders =
+            Array.isArray(orders)
+                ? orders
+                : [];
+
+
+        updateOrderCounters();
+
+        renderOrders();
+
+        renderRecentOrders();
+
+
+    }
+
+    catch (error) {
+
+
+        console.error(error);
+
+
+        document
+            .getElementById(
+                "orders"
+            )
+            .innerHTML = `
+
+                <div class="empty-state">
+
+                    <div>⚠️</div>
+
+                    <h3>
+                        Ошибка загрузки заказов
+                    </h3>
+
+                    <p>
+                        ${escapeHtml(
+                            error.message
+                        )}
+                    </p>
+
+                </div>
+
+            `;
+
+    }
+
+}
+
+
+function updateOrderCounters() {
+
+    const count =
+        allOrders.length;
+
+
+    document
+        .getElementById(
+            "orders-count"
+        )
+        .textContent =
+        count;
+
+
+    document
+        .getElementById(
+            "sidebar-orders-count"
+        )
+        .textContent =
+        count;
+
+}
+
+
+function getStatusClass(status) {
+
+    const statuses = {
+
+        "Новый":
+            "status-new",
+
+        "Принят":
+            "status-accepted",
+
+        "Готовится":
+            "status-preparing",
+
+        "Отправлен":
+            "status-shipped",
+
+        "Доставлен":
+            "status-delivered"
+
+    };
+
+
+    return statuses[status]
+        ||
+        "status-new";
+
+}
+
+
+function renderOrders() {
+
+    const container =
+        document
+            .getElementById(
+                "orders"
+            );
+
+
+    let orders =
+        allOrders;
+
+
+    if (
+        currentOrderFilter !==
+        "all"
+    ) {
+
+        orders =
+            allOrders.filter(
+                order =>
+                    order.status
+                    ===
+                    currentOrderFilter
+            );
+
+    }
+
+
+    if (!orders.length) {
+
+        container.innerHTML = `
+
+            <div class="empty-state">
+
+                <div>📦</div>
+
+                <h3>Заказов нет</h3>
+
+                <p>
+                    Здесь появятся заказы клиентов
+                </p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+
+        orders
+            .map(order => {
+
+
+                const productsHtml =
+
+                    Array.isArray(
+                        order.products
+                    )
+
+                    ?
+
+                    order.products
+                        .map(product => `
+
+                            <div
+                                class="order-product-row"
+                            >
+
+                                <span>👜</span>
+
+                                <span>
+                                    ${escapeHtml(
+                                        product.name
+                                    )}
+                                </span>
+
+                                <strong>
+                                    ${product.price}
+                                    сомони ×
+                                    ${
+                                        product.quantity
+                                        ||
+                                        1
+                                    }
+                                </strong>
+
+                            </div>
+
+                        `)
+                        .join("")
+
+                    :
+
+                    "<p>Товары отсутствуют</p>";
+
+
+                return `
+
+                    <article
+                        class="order-card"
+                    >
+
+                        <div
+                            class="order-card-header"
+                        >
+
+                            <div>
+
+                                <span
+                                    class="order-number"
+                                >
+                                    Заказ #${order.id}
+                                </span>
+
+                                <small>
+                                    ${escapeHtml(
+                                        order.date
+                                        ||
+                                        ""
+                                    )}
+                                </small>
+
+                            </div>
+
+
+                            <span
+                                class="
+                                    status-badge
+                                    ${
+                                        getStatusClass(
+                                            order.status
+                                        )
+                                    }
+                                "
+                            >
+                                ${escapeHtml(
+                                    order.status
+                                )}
+                            </span>
+
+                        </div>
+
+
+                        <div
+                            class="order-customer"
+                        >
+
+                            <div
+                                class="customer-avatar"
+                            >
+                                ${
+                                    escapeHtml(
+                                        order.name
+                                            ? order.name
+                                                .charAt(
+                                                    0
+                                                )
+                                                .toUpperCase()
+                                            : "?"
+                                    )
+                                }
+                            </div>
+
+
+                            <div>
+
+                                <strong>
+                                    ${escapeHtml(
+                                        order.name
+                                        ||
+                                        "Клиент"
+                                    )}
+                                </strong>
+
+                                <span>
+                                    📞
+                                    ${escapeHtml(
+                                        order.phone
+                                        ||
+                                        ""
+                                    )}
+                                </span>
+
+                                <span>
+                                    📍
+                                    ${escapeHtml(
+                                        order.address
+                                        ||
+                                        ""
+                                    )}
+                                </span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="order-products-list"
+                        >
+
+                            <h4>
+                                Товары
+                            </h4>
+
+                            ${productsHtml}
+
+                        </div>
+
+
+                        <div
+                            class="order-card-footer"
+                        >
+
+                            <select
+                                id="status-${order.id}"
+                                class="status-select"
+                            >
+
+                                <option value="Новый">
+                                    Новый
+                                </option>
+
+                                <option value="Принят">
+                                    Принят
+                                </option>
+
+                                <option value="Готовится">
+                                    Готовится
+                                </option>
+
+                                <option value="Отправлен">
+                                    Отправлен
+                                </option>
+
+                                <option value="Доставлен">
+                                    Доставлен
+                                </option>
+
+                            </select>
+
+
+                            <button
+                                class="update-status-button"
+                                onclick="
+                                    changeStatus(
+                                        '${order.id}'
+                                    )
+                                "
+                            >
+                                Обновить
+                            </button>
+
+
+                            <button
+                                class="delete-order-button"
+                                onclick="
+                                    deleteOrder(
+                                        '${order.id}'
+                                    )
+                                "
+                            >
+                                🗑️
+                            </button>
+
+                        </div>
+
+                    </article>
+
+                `;
+
+            })
+
+            .join("");
+
+
+    orders.forEach(order => {
+
+        const select =
+            document
+                .getElementById(
+                    "status-" +
+                    order.id
+                );
+
+
+        if (select) {
+
+            select.value =
+                order.status;
+
+        }
+
+    });
+
+}
+
+
+function renderRecentOrders() {
+
+    const container =
+        document
+            .getElementById(
+                "recent-orders"
+            );
+
+
+    const recent =
+        allOrders.slice(
+            0,
+            5
+        );
+
+
+    if (!recent.length) {
+
+        container.innerHTML = `
+
+            <div class="empty-small">
+                Заказов пока нет
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    container.innerHTML =
+
+        recent
+            .map(order => `
+
+                <div
+                    class="recent-order"
+                >
+
+                    <div
+                        class="recent-order-icon"
+                    >
+                        📦
+                    </div>
+
+
+                    <div>
+
+                        <strong>
+                            Заказ #${order.id}
+                        </strong>
+
+                        <span>
+                            ${escapeHtml(
+                                order.name
+                                ||
+                                "Клиент"
+                            )}
+                        </span>
+
+                    </div>
+
+
+                    <span
+                        class="
+                            status-badge
+                            ${
+                                getStatusClass(
+                                    order.status
+                                )
+                            }
+                        "
+                    >
+                        ${escapeHtml(
+                            order.status
+                        )}
+                    </span>
+
+                </div>
+
+            `)
+            .join("");
+
+}
+
+
+// ==============================
+// FILTERS
+// ==============================
+
+document
+    .querySelectorAll(
+        ".order-filter"
+    )
+    .forEach(button => {
+
+        button.addEventListener(
+            "click",
+            () => {
+
+
+                document
+                    .querySelectorAll(
+                        ".order-filter"
+                    )
+                    .forEach(item => {
+
+                        item.classList.remove(
+                            "active"
+                        );
+
+                    });
+
+
+                button.classList.add(
+                    "active"
+                );
+
+
+                currentOrderFilter =
+                    button.dataset.filter;
+
+
+                renderOrders();
+
+            }
+
+        );
+
+    });
+
+
+document
+    .getElementById(
+        "product-search"
+    )
+    .addEventListener(
+        "input",
+        renderProducts
+    );
+
+
+document
+    .getElementById(
+        "category-filter"
+    )
+    .addEventListener(
+        "change",
+        renderProducts
+    );
+
+
+// ==============================
+// CHANGE ORDER STATUS
+// ==============================
+
+async function changeStatus(id) {
+
+    const select =
+        document
+            .getElementById(
+                "status-" +
+                id
+            );
+
+
+    if (!select) return;
+
+
+    try {
+
+
+        const response =
+            await fetch(
+
+                "/api/orders/" +
+                id,
+
+                {
+
+                    method:
+                        "PUT",
+
+                    headers: {
+
+                        "Content-Type":
+                            "application/json"
+
+                    },
+
+                    body:
+                        JSON.stringify({
+
+                            status:
+                                select.value
+
+                        })
+
+                }
+
+            );
+
+
+        const result =
+            await getJsonResponse(
+                response
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                result.message ||
+                "Ошибка изменения статуса"
+            );
+
+        }
+
+
+        showToast(
+            "Статус заказа обновлён",
+            "success"
+        );
+
+
+        await loadOrders();
+
+
+    }
+
+    catch (error) {
+
+        showToast(
+            error.message,
+            "error"
+        );
+
+    }
+
+}
+
+
+// ==============================
+// DELETE ORDER
+// ==============================
+
+async function deleteOrder(id) {
+
+    if (
+        !confirm(
+            "Удалить этот заказ?"
+        )
+    ) {
+
+        return;
+
+    }
+
+
+    try {
+
+
+        const response =
+            await fetch(
+
+                "/api/orders/" +
+                id,
+
+                {
+
+                    method:
+                        "DELETE"
+
+                }
+
+            );
+
+
+        const result =
+            await getJsonResponse(
+                response
+            );
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                result.message ||
+                "Ошибка удаления заказа"
+            );
+
+        }
+
+
+        showToast(
+            "Заказ удалён",
+            "success"
+        );
+
+
+        await loadOrders();
+
+
+    }
+
+    catch (error) {
+
+        showToast(
+            error.message,
+            "error"
+        );
+
+    }
+
+}
+
+
+// ==============================
+// TOAST
+// ==============================
+
+function showToast(
+    message,
+    type = "success"
+) {
+
+    const container =
+        document
+            .getElementById(
+                "toast-container"
+            );
+
+
+    const toast =
+        document.createElement(
+            "div"
+        );
+
+
+    toast.className =
+        "toast " +
+        type;
+
+
+    toast.innerHTML = `
+
+        <span>
+            ${
+                type === "success"
+                    ? "✓"
+                    : "!"
+            }
+        </span>
+
+        ${escapeHtml(message)}
+
+    `;
+
+
+    container.appendChild(
+        toast
+    );
+
+
+    setTimeout(
+        () => {
+
+            toast.remove();
+
+        },
+        3500
+    );
+
+}
+
+
+// ==============================
+// ESCAPE
+// ==============================
+
+function escapeHtml(value) {
+
+    return String(
+        value ?? ""
+    )
+
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+
+    .replace(
+        /</g,
+        "&lt;"
+    )
+
+    .replace(
+        />/g,
+        "&gt;"
+    )
+
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+
+// ==============================
+// MOBILE MENU
+// ==============================
+
+const sidebar =
+    document.getElementById(
+        "sidebar"
+    );
+
+
+const sidebarClose =
+    document.getElementById(
+        "sidebarClose"
+    );
+
+
+const mobileMenu =
+    document.getElementById(
+        "mobile-menu"
+    );
+
+
+if (mobileMenu) {
+
+    mobileMenu.addEventListener(
+        "click",
+        () => {
+
+            sidebar.classList.toggle(
+                "mobile-open"
+            );
+
+        }
+    );
+
+}
+
+
+if (sidebarClose) {
+
+    sidebarClose.addEventListener(
+        "click",
+        () => {
+
+            sidebar.classList.remove(
+                "mobile-open"
+            );
+
+        }
+    );
+
+}
+
+
+// ==============================
+// START
+// ==============================
+
+loadProducts();
+
+loadOrders();
+
+</script>
+
+</div>
+
+<script>
+(async function protectAdminUI() {
+  const screen = document.getElementById("admin-login-screen");
+  const form = document.getElementById("admin-login-form");
+  const error = document.getElementById("admin-login-error");
+  async function check() {
+    const r = await fetch("/api/admin/me");
+    const data = await r.json();
+    if (data.authenticated) {
+      document.body.classList.remove("admin-locked");
+      screen.remove();
+      return true;
+    }
+    return false;
+  }
+  if (await check()) return;
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    error.textContent = "";
+    const response = await fetch("/api/admin/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: document.getElementById("admin-username").value,
+        password: document.getElementById("admin-password").value
+      })
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      error.textContent = data.message || "Ошибка входа";
+      return;
+    }
+    window.location.reload();
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>sumka.tj — Интернет-магазин сумок</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<header class="header">
+
+    <a href="#home" class="logo">
+        sumka<span>.tj</span>
+    </a>
+
+    <nav class="desktop-nav">
+        <a href="#home">Главная</a>
+        <a href="#catalog">Каталог</a>
+        <a href="#about">О нас</a>
+        <a href="#contacts">Контакты</a>
+    </nav>
+
+    <div class="header-actions">
+
+        <button class="profile-button" onclick="openProfile()">
+            👤
+        </button>
+
+        <button class="cart-button" onclick="openCart()">
+            🛒 Корзина
+            <span id="cart-count">0</span>
+        </button>
+
+    </div>
+
+</header>
+
+
+<section class="hero" id="home">
+
+    <div class="hero-text">
+
+        <p class="subtitle">
+            НОВАЯ КОЛЛЕКЦИЯ
+        </p>
+
+        <h1>
+            Твой стиль.
+            <br>
+            Твоя сумка.
+        </h1>
+
+        <p>
+            Стильные сумки и аксессуары
+            для каждого дня.
+        </p>
+
+        <a href="#catalog" class="main-button">
+            Смотреть товары
+        </a>
+
+    </div>
+
+    <div class="hero-image">
+        👜
+    </div>
+
+</section>
+
+
+<section class="filters-section" id="catalog">
+
+    <div class="filters-header">
+
+        <div>
+
+            <p class="filters-label">
+                НАЙДИ СВОЙ ТОВАР
+            </p>
+
+            <h2>
+                Каталог
+            </h2>
+
+        </div>
+
+        <button
+            class="reset-filters"
+            onclick="resetFilters()"
+        >
+            ↻ Сбросить
+        </button>
+
+    </div>
+
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            id="search-input"
+            placeholder="🔍 Поиск товаров..."
+            oninput="searchProducts()"
+        >
+
+        <button onclick="clearSearch()">
+            ✕
+        </button>
+
+    </div>
+
+
+    <div class="filters-panel">
+
+        <div class="filter-group">
+
+            <span class="filter-title">
+                Категория
+            </span>
+
+            <div class="category-list">
+
+                <button
+                    class="category-filter active"
+                    onclick="setCategory('all', this)"
+                >
+                    Все
+                </button>
+
+                <button
+                    class="category-filter"
+                    onclick="setCategory('bag', this)"
+                >
+                    👜 Сумки
+                </button>
+
+                <button
+                    class="category-filter"
+                    onclick="setCategory('backpack', this)"
+                >
+                    🎒 Рюкзаки
+                </button>
+
+                <button
+                    class="category-filter"
+                    onclick="setCategory('accessory', this)"
+                >
+                    👛 Аксессуары
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="filter-divider"></div>
+
+
+        <div class="filter-group price-filter">
+
+            <span class="filter-title">
+                Цена, сомони
+            </span>
+
+            <div class="price-inputs">
+
+                <input
+                    type="number"
+                    id="min-price"
+                    placeholder="От"
+                    oninput="applyFilters()"
+                >
+
+                <span>—</span>
+
+                <input
+                    type="number"
+                    id="max-price"
+                    placeholder="До"
+                    oninput="applyFilters()"
+                >
+
+            </div>
+
+        </div>
+
+
+        <div class="filter-divider"></div>
+
+
+        <div class="filter-group sort-filter">
+
+            <span class="filter-title">
+                Сортировка
+            </span>
+
+            <select
+                id="sort-select"
+                onchange="applyFilters()"
+            >
+
+                <option value="default">
+                    По популярности
+                </option>
+
+                <option value="cheap">
+                    Сначала дешёвые
+                </option>
+
+                <option value="expensive">
+                    Сначала дорогие
+                </option>
+
+                <option value="new">
+                    Новые товары
+                </option>
+
+            </select>
+
+        </div>
+
+    </div>
+
+
+    <div
+        class="products"
+        id="products"
+    >
+
+        <p>
+            Загрузка товаров...
+        </p>
+
+    </div>
+
+</section>
+
+
+<section class="about" id="about">
+
+    <div>
+
+        <p class="subtitle">
+            ПОЧЕМУ SUMKA.TJ?
+        </p>
+
+        <h2>
+            Стиль начинается
+            с деталей ✨
+        </h2>
+
+        <p>
+            Мы выбираем стильные и качественные
+            сумки для каждого дня.
+        </p>
+
+    </div>
+
+
+    <div class="advantages">
+
+        <div>
+            🚚
+
+            <h3>
+                Быстрая доставка
+            </h3>
+
+            <p>
+                Доставляем по Таджикистану
+            </p>
+        </div>
+
+
+        <div>
+            ⭐
+
+            <h3>
+                Качество
+            </h3>
+
+            <p>
+                Только красивые товары
+            </p>
+        </div>
+
+
+        <div>
+            💬
+
+            <h3>
+                Поддержка
+            </h3>
+
+            <p>
+                Всегда готовы помочь
+            </p>
+        </div>
+
+    </div>
+
+</section>
+
+
+<section class="contacts" id="contacts">
+
+    <h2>
+        Свяжитесь с нами
+    </h2>
+
+    <p>
+        Есть вопросы? Напишите нам!
+    </p>
+
+    <div class="contact-buttons">
+
+        <a class="contact-button telegram-contact" href="https://t.me/sumkart" target="_blank" rel="noopener noreferrer">
+            <span class="contact-icon">✈</span>
+            <span>Telegram</span>
+            <small>@sumkart</small>
+        </a>
+
+        <a class="contact-button whatsapp-contact" href="https://wa.me/992974741774" target="_blank" rel="noopener noreferrer">
+            <span class="contact-icon">◉</span>
+            <span>WhatsApp</span>
+            <small>+992 97 474 17 74</small>
+        </a>
+
+    </div>
+
+</section>
+
+<!-- БЫСТРЫЕ КОНТАКТЫ -->
+<div class="floating-contacts" aria-label="Связаться с нами">
+    <a class="floating-contact floating-telegram" href="https://t.me/sumkart" target="_blank" rel="noopener noreferrer" aria-label="Открыть Telegram">✈</a>
+    <a class="floating-contact floating-whatsapp" href="https://wa.me/992974741774" target="_blank" rel="noopener noreferrer" aria-label="Открыть WhatsApp">◉</a>
+</div>
+
+
+<!-- ПРОФИЛЬ -->
+
+<div
+    class="profile-overlay"
+    id="profile-overlay"
+>
+
+    <div class="profile-panel">
+
+        <button
+            class="close-profile"
+            onclick="closeProfile()"
+        >
+            ✕
+        </button>
+
+
+        <div class="profile-header">
+
+            <div class="profile-avatar">
+                👤
+            </div>
+
+            <div>
+
+                <h2>
+                    Мой профиль
+                </h2>
+
+                <p>
+                    Ваши данные и история заказов
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="profile-section">
+
+            <div class="profile-section-title">
+
+                <h3>
+                    👤 Личные данные
+                </h3>
+
+                <button
+                    id="edit-profile-button"
+                    onclick="toggleProfileEdit()"
+                >
+                    ✏️ Изменить
+                </button>
+
+            </div>
+
+
+            <div class="profile-form">
+
+                <label>
+                    Имя
+                </label>
+
+                <input
+                    type="text"
+                    id="profile-name"
+                    placeholder="Ваше имя"
+                    disabled
+                >
+
+
+                <label>
+                    Телефон
+                </label>
+
+                <input
+                    type="tel"
+                    id="profile-phone"
+                    placeholder="Ваш телефон"
+                    disabled
+                >
+
+
+                <label>
+                    Адрес
+                </label>
+
+                <textarea
+                    id="profile-address"
+                    placeholder="Ваш адрес"
+                    disabled
+                ></textarea>
+
+
+                <button
+                    class="save-profile-button"
+                    id="save-profile-button"
+                    onclick="saveProfile()"
+                    style="display:none"
+                >
+                    💾 Сохранить данные
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div class="profile-section">
+
+            <div class="profile-section-title">
+
+                <h3>
+                    ❤️ Избранное
+                </h3>
+
+                <button onclick="showFavorites()">
+                    Посмотреть
+                </button>
+
+            </div>
+
+            <p class="profile-hint">
+                Ваши любимые товары находятся здесь
+            </p>
+
+        </div>
+
+
+        <div class="profile-section">
+
+            <div class="profile-section-title">
+
+                <h3>
+                    📦 История заказов
+                </h3>
+
+            </div>
+
+            <div
+                class="orders-history"
+                id="orders-history"
+            >
+
+                <p class="empty-orders">
+                    У вас пока нет заказов
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- КОРЗИНА -->
+
+<div
+    class="cart-overlay"
+    id="cart-overlay"
+>
+
+    <div class="cart">
+
+        <button
+            class="close-cart"
+            onclick="closeCart()"
+        >
+            ✕
+        </button>
+
+
+        <h2>
+            Ваша корзина 🛒
+        </h2>
+
+
+        <div id="cart-items">
+
+            <p class="empty-cart">
+                Корзина пока пустая
+            </p>
+
+        </div>
+
+
+        <div class="order-form">
+
+            <h3>
+                Оформление заказа
+            </h3>
+
+
+            <input
+                type="text"
+                id="customer-name"
+                placeholder="Ваше имя"
+            >
+
+
+            <input
+                type="tel"
+                id="customer-phone"
+                placeholder="Ваш телефон"
+            >
+
+
+            <textarea
+                id="customer-address"
+                placeholder="Ваш адрес"
+            ></textarea>
+
+        </div>
+
+
+        <div class="cart-bottom">
+
+            <h3>
+
+                Итого:
+
+                <span id="total-price">
+                    0
+                </span>
+
+                сомони
+
+            </h3>
+
+
+            <button
+                class="order-button"
+                onclick="makeOrder()"
+            >
+                Оформить заказ
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- МОБИЛЬНАЯ НАВИГАЦИЯ -->
+
+<nav class="mobile-bottom-nav">
+
+    <a
+        href="#home"
+        class="mobile-nav-item"
+    >
+
+        <span>
+            🏠
+        </span>
+
+        <small>
+            Главная
+        </small>
+
+    </a>
+
+
+    <a
+        href="#catalog"
+        class="mobile-nav-item"
+    >
+
+        <span>
+            🛍️
+        </span>
+
+        <small>
+            Каталог
+        </small>
+
+    </a>
+
+
+    <button
+        class="mobile-nav-item mobile-cart-button"
+        onclick="openCart()"
+    >
+
+        <span>
+
+            🛒
+
+            <b id="mobile-cart-count">
+                0
+            </b>
+
+        </span>
+
+        <small>
+            Корзина
+        </small>
+
+    </button>
+
+
+    <button
+        class="mobile-nav-item"
+        onclick="openProfile()"
+    >
+
+        <span>
+            👤
+        </span>
+
+        <small>
+            Профиль
+        </small>
+
+    </button>
+
+</nav>
+
+
+<footer>
+
+    <div class="logo">
+        sumka<span>.tj</span>
+    </div>
+
+    <p>
+        © 2026 sumka.tj
+    </p>
+
+</footer>
+
+
+
+
+<!-- =====================================
+     НОВОЕ МОДАЛЬНОЕ ОКНО ТОВАРА
+===================================== -->
+
+<div id="product-modal" class="product-modal" aria-hidden="true">
+    <div class="product-modal-content">
+
+        <button class="product-modal-close" onclick="closeProductModal()" aria-label="Закрыть">×</button>
+
+        <div class="product-modal-gallery">
+            <div class="modal-main-image-wrapper">
+                <img id="modal-product-image" src="/bag1.jpg" alt="Товар">
+            </div>
+        </div>
+
+        <div class="product-modal-info">
+            <div id="modal-product-category" class="modal-category">Товар</div>
+
+            <h2 id="modal-product-name">Название товара</h2>
+
+            <div id="modal-product-rating" class="modal-rating">⭐ 5.0 <span>Новый товар</span></div>
+
+            <p id="modal-product-description" class="modal-description">
+                Описание товара
+            </p>
+
+            <div id="modal-product-price" class="modal-price">0 сомони</div>
+
+            <div class="modal-actions">
+                <button id="modal-add-button" class="modal-add-button">🛒 В корзину</button>
+                <button id="modal-buy-button" class="modal-buy-button">⚡ Купить сейчас</button>
+            </div>
+
+            <div class="modal-features">
+                <div class="modal-feature"><strong>🚚 Доставка</strong>По Таджикистану</div>
+                <div class="modal-feature"><strong>✨ Качество</strong>Проверенные товары</div>
+                <div class="modal-feature"><strong>🔒 Покупка</strong>Быстро и удобно</div>
+                <div class="modal-feature"><strong>💬 Поддержка</strong>Мы рядом каждый день</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="script.js"></script>
+
+</body>
+
+</html>
